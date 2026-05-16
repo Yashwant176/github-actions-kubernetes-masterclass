@@ -56,7 +56,7 @@ kind: Kustomization
 images:
 - name: backend
   newName: yashwant176/skillpulse-backend
-  newTag: 1e3e18edb27933d55113bc9c0b6cdfe33320d655
+  newTag: eb0afdd3eb55fe51123e8a2e53644aba3ef6c0b8
 - name: frontend
   newName: yashwant176/skillpulse-frontend
-  newTag: 1e3e18edb27933d55113bc9c0b6cdfe33320d655
+  newTag: eb0afdd3eb55fe51123e8a2e53644aba3ef6c0b8
