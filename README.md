@@ -1,6 +1,6 @@
 # SkillPulse — GitHub Actions & Kubernetes Masterclass
 
-A small, real application with a real CI/CD pipeline. The app — SkillPulse — lets you track skills you're learning and the hours you put in. The point isn't the app. The point is everything around it: how a single `git push` becomes a running update on a server in under two minutes, with no human pressing any button.
+A small real application with a real CI/CD pipeline. The app — SkillPulse — lets you track skills you're learning and the hours you put in. The point isn't the app. The point is everything around it: how a single `git push` becomes a running update on a server in under two minutes, with no human pressing any button.
 
 This repo is the working demo for the **TrainWithShubham GitHub Actions & Kubernetes Masterclass**.
 
