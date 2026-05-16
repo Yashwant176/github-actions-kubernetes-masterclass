@@ -20,7 +20,7 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
-    
+  #backend
   backend:
     image: ${DOCKERHUB_USERNAME}/skillpulse-backend:latest
     build: ./backend
