@@ -1,0 +1,5 @@
+resources:
+  - 00-namespace.yaml
+  - 10-mysql.yaml
+  - 20-backend.yaml
+  - 30-frontend.yaml

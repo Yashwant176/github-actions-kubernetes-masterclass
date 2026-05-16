@@ -1,0 +1,53 @@
+namespace: skillpulse-dev
+
+resources:
+  - ../base
+
+patches:
+  - target:
+      kind: Deployment
+      name: backend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+
+  - target:
+      kind: Deployment
+      name: frontend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: add
+        path: /spec/template/spec/securityContext
+        value:
+          runAsNonRoot: true
+          runAsUser: 101
+      - op: add
+        path: /spec/template/spec/containers/0/securityContext
+        value:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+      - op: add
+        path: /spec/template/spec/volumes
+        value:
+          - name: nginx-cache
+            emptyDir: {}
+          - name: nginx-run
+            emptyDir: {}
+      - op: add
+        path: /spec/template/spec/containers/0/volumeMounts
+        value:
+          - name: nginx-cache
+            mountPath: /var/cache/nginx
+          - name: nginx-run
+            mountPath: /var/run
+
+  - target:
+      kind: Service
+      name: frontend
+    patch: |-
+      - op: replace
+        path: /spec/ports/0/nodePort
+        value: 30081
