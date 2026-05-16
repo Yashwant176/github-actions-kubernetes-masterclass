@@ -27,6 +27,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # BUILD + LOAD (only once)
       - name: Build backend image
         uses: docker/build-push-action@v7
         with:
@@ -41,25 +42,25 @@ jobs:
           load: true
           tags: skillpulse-frontend:ci
 
-      - name: Install Trivy (fixed)
+      # INSTALL TRIVY (stable method)
+      - name: Install Trivy
         run: |
           sudo apt-get update
           sudo apt-get install -y wget
 
-          TRIVY_VERSION=0.52.2
+          wget -qO- https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
 
-          wget -q https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
-          tar zxvf trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
-
-          sudo mv trivy /usr/local/bin/
           trivy --version
 
+      # SCAN BACKEND
       - name: Trivy scan backend
         run: trivy image --exit-code 0 --severity HIGH,CRITICAL skillpulse-backend:ci
 
+      # SCAN FRONTEND
       - name: Trivy scan frontend
         run: trivy image --exit-code 0 --severity HIGH,CRITICAL skillpulse-frontend:ci
 
+      # PUSH BACKEND
       - name: Push backend image
         if: ${{ vars.DEPLOY_ENABLED == 'true' }}
         uses: docker/build-push-action@v7
@@ -70,6 +71,7 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/skillpulse-backend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/skillpulse-backend:${{ github.sha }}
 
+      # PUSH FRONTEND
       - name: Push frontend image
         if: ${{ vars.DEPLOY_ENABLED == 'true' }}
         uses: docker/build-push-action@v7
