@@ -10,7 +10,7 @@ Thumbs.db
 # Local env files
 .env
 .env.local
-
+security-reports/
 # Logs
 *.log
 
