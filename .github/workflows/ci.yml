@@ -26,10 +26,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # =========================
-      # BUILD BACKEND
-      # =========================
-
       - name: Build backend image
         uses: docker/build-push-action@v7
         with:
@@ -38,9 +34,6 @@ jobs:
           push: false
           tags: skillpulse-backend:latest
 
-      # =========================
-      # BUILD FRONTEND
-      # =========================
 
       - name: Build frontend image
         uses: docker/build-push-action@v7
@@ -49,10 +42,6 @@ jobs:
           load: true
           push: false
           tags: skillpulse-frontend:latest
-
-      # =========================
-      # TRIVY BACKEND SCAN
-      # =========================
 
       - name: Run Trivy scan on backend
         uses: aquasecurity/trivy-action@master
@@ -64,10 +53,6 @@ jobs:
           vuln-type: 'os,library'
           severity: 'HIGH,CRITICAL'
 
-      # =========================
-      # TRIVY FRONTEND SCAN
-      # =========================
-
       - name: Run Trivy scan on frontend
         uses: aquasecurity/trivy-action@master
         with:
@@ -77,10 +62,6 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'HIGH,CRITICAL'
-
-      # =========================
-      # GENERATE REPORTS
-      # =========================
 
       - name: Generate backend report
         run: |
@@ -103,19 +84,11 @@ jobs:
             -o /reports/frontend-report.json \
             skillpulse-frontend:latest
 
-      # =========================
-      # UPLOAD REPORTS
-      # =========================
-
       - name: Upload security reports
         uses: actions/upload-artifact@v4
         with:
           name: trivy-security-reports
-          path: security-reports/
-
-      # =========================
-      # PUSH IMAGES
-      # =========================
+          path: security-reports
 
       - name: Push backend image
         if: ${{ vars.DEPLOY_ENABLED == 'true' }}
