@@ -20,26 +20,19 @@ jobs:
         with:
           ref: main
 
-      # Get commit SHA from CI
-      
-      - name: Set variables
-        run: |
-          echo "SHA=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_ENV
+      - name: Set SHA
+        run: echo "SHA=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_ENV
 
-      
-      # Install kubectl + kustomize
-      
-      - name: Setup tools
+      - name: Install Kustomize
         run: |
-          sudo apt-get update
-          sudo apt-get install -y curl
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
-          sudo mv kustomize /usr/local/bin/
+          KUSTOMIZE_VERSION=v5.4.2
+          curl -sLo kustomize.tar.gz \
+            https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
+          tar -xzf kustomize.tar.gz
+          sudo mv kustomize /usr/local/bin/kustomize
+          kustomize version
 
-    
-      # Update image in Kustomize (DEV)
-      
-      - name: Update dev manifests (kustomize)
+      - name: Update dev manifests
         env:
           DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
@@ -48,18 +41,17 @@ jobs:
           kustomize edit set image backend=${DOCKER_USER}/skillpulse-backend:${SHA}
           kustomize edit set image frontend=${DOCKER_USER}/skillpulse-frontend:${SHA}
 
-      # Commit changes
-    
-      - name: Commit + push if changed
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet; then
+          git add k8s/dev/kustomization.yaml
+
+          if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
 
-          git add k8s/dev/kustomization.yaml
           git commit -m "chore: update dev images to ${SHA:0:7}"
           git push
